@@ -58,7 +58,7 @@ func (e BlockDns) ServeDNS(ctx context.Context, w dns.ResponseWriter, r *dns.Msg
 
 func (e BlockDns) isBlocked(domain string) bool {
 	fmt.Fprintln(out, domain)
-	return domain == "facebook.com"
+	return domain == "www.facebook.com."
 }
 
 // Name implements the Handler interface.
