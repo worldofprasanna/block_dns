@@ -12,6 +12,7 @@ import (
 	"github.com/coredns/coredns/plugin"
 	"github.com/coredns/coredns/plugin/metrics"
 	clog "github.com/coredns/coredns/plugin/pkg/log"
+	"github.com/coredns/coredns/request"
 
 	"github.com/miekg/dns"
 )
@@ -38,12 +39,26 @@ func (e BlockDns) ServeDNS(ctx context.Context, w dns.ResponseWriter, r *dns.Msg
 
 	// Wrap.
 	pw := NewResponsePrinter(w)
+	state := request.Request{W: w, Req: r}
+	block := e.isBlocked(state.Name())
 
 	// Export metric with the server label set to the current server handling the request.
 	requestCount.WithLabelValues(metrics.WithServer(ctx)).Inc()
 
+	if block {
+		resp := new(dns.Msg)
+		resp.SetRcode(r, dns.RcodeNameError)
+		w.WriteMsg(resp)
+
+		return dns.RcodeNameError, nil
+	}
 	// Call next plugin (if any).
 	return plugin.NextOrFailure(e.Name(), e.Next, ctx, pw, r)
+}
+
+func (e BlockDns) isBlocked(domain string) bool {
+	fmt.Fprintln(out, domain)
+	return domain == "facebook.com"
 }
 
 // Name implements the Handler interface.
