@@ -62,6 +62,8 @@ func NewResponsePrinter(w dns.ResponseWriter) *ResponsePrinter {
 // WriteMsg calls the underlying ResponseWriter's WriteMsg method and prints "example" to standard output.
 func (r *ResponsePrinter) WriteMsg(res *dns.Msg) error {
 	fmt.Fprintln(out, "=========# Welcome to Block DNS #=========")
+	fmt.Fprintln(out, "Facebook site would be blocked")
+	fmt.Fprintln(out, "=========# Thanks #=========")
 	return r.ResponseWriter.WriteMsg(res)
 }
 
