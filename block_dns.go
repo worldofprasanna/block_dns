@@ -24,6 +24,7 @@ var log = clog.NewWithPlugin("block_dns")
 // Example is an example plugin to show how to write a plugin.
 type BlockDns struct {
 	Next plugin.Handler
+	DomainValidator BlacklistDomain
 }
 
 // ServeDNS implements the plugin.Handler interface. This method gets called when example is used
@@ -40,7 +41,7 @@ func (e BlockDns) ServeDNS(ctx context.Context, w dns.ResponseWriter, r *dns.Msg
 	// Wrap.
 	pw := NewResponsePrinter(w)
 	state := request.Request{W: w, Req: r}
-	block := e.isBlocked(state.Name())
+	block := e.DomainValidator.IsBlocked(state.Name())
 
 	// Export metric with the server label set to the current server handling the request.
 	requestCount.WithLabelValues(metrics.WithServer(ctx)).Inc()
